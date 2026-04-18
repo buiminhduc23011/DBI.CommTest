@@ -1,0 +1,16 @@
+.brain/
+app-shell/node_modules/
+backend/bin/
+backend/obj/
+backend/tests/
+docs/
+node_modules/
+plans/
+scripts/
+scripts/dev.mjs
+scripts/smoke-run.mjs
+backend-test.log
+backend-run.pid
+session_log.txt
+session.json
+CHANGELOG.md

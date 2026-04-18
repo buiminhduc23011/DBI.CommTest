@@ -1,0 +1,19 @@
+{
+  "name": "plc-test-studio-shell",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc -p tsconfig.json && electron dist/main.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "electron": "^37.4.0",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "plc-test-studio": "file:.."
+  }
+}

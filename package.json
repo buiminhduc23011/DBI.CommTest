@@ -1,0 +1,22 @@
+{
+  "name": "plc-test-studio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "npm run build:frontend && npm run build:backend && npm run build:shell",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "dotnet publish backend/backend.csproj -c Release -o backend/publish",
+    "build:shell": "npm run build --prefix app-shell",
+    "lint": "npm run lint --prefix frontend && dotnet build backend/backend.csproj -nologo",
+    "smoke-run": "node scripts/smoke-run.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "wait-on": "^8.0.5"
+  },
+  "dependencies": {
+    "plc-test-studio": "file:"
+  }
+}

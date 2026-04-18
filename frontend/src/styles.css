@@ -1,0 +1,167 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f5f7fb;
+  font-family: 'Segoe UI', Inter, sans-serif;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.flexlayout__layout {
+  --color-tabset-background: #f3f3f3 !important;
+  --color-tabset-header-background: #f3f3f3 !important;
+  --font-family: 'Segoe UI', Inter, sans-serif !important;
+  --color-border-divider-line: #e2e2e2 !important;
+  --color-tabset-divider-line: #e2e2e2 !important;
+}
+
+.flexlayout__tabset {
+  border: 1px solid var(--color-border-divider-line, #e2e2e2) !important;
+}
+
+.flexlayout__tabset_tabbar_outer {
+  border-bottom: 1px solid var(--color-border-divider-line, #e2e2e2) !important;
+}
+
+.flexlayout__tabset_tabbar_inner_tab_container {
+  padding: 0 !important;
+}
+
+.flexlayout__tabset_header,
+.flexlayout__tabset_tabbar_outer_top,
+.flexlayout__tabset_tabbar_outer_bottom {
+  padding: 0 !important;
+}
+
+.flexlayout__tab_button {
+  border-radius: 0 !important;
+  padding: 12px !important;
+  display: flex;
+  align-items: center;
+  font-size: 13px !important;
+  font-family: 'Segoe UI', Inter, sans-serif !important;
+  font-weight: 500 !important;
+  color: #616161 !important;
+  margin: 0 !important;
+}
+
+.flexlayout__tab_button_content {
+  color: inherit !important;
+}
+
+.flexlayout__tab_button--selected {
+  border-top: 1px solid #1677ff !important;
+  border-right: 1px solid var(--color-border-divider-line, #e2e2e2) !important;
+  border-left: 1px solid transparent !important;
+  border-bottom: 1px solid var(--color-tab-selected-background, #ffffff) !important;
+  margin-bottom: -1px;
+  background-color: var(--color-tab-selected-background, #ffffff) !important;
+  color: var(--color-tab-selected-text, #333333) !important;
+  z-index: 2;
+}
+
+.flexlayout__tab_button--unselected {
+  border-right: 1px solid var(--color-border-divider-line, #e2e2e2) !important;
+  border-top: 1px solid transparent !important;
+  border-left: 1px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
+  background-color: var(--color-tab-unselected-background, transparent) !important;
+  color: var(--color-tab-unselected-text, #666) !important;
+  margin-bottom: -1px;
+}
+
+.flexlayout__tab_button--unselected:hover {
+  background-color: var(--color-tab-unselected-hover-background, #e8e8e8) !important;
+  color: var(--color-tab-unselected-hover-text, #333333) !important;
+}
+
+.flexlayout__tab_button_textbox {
+  border: 1px solid #1677ff !important;
+  border-radius: 2px !important;
+  padding: 0 2px !important;
+  height: 22px;
+  background-color: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  outline: none;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  margin: 0;
+  width: 120px;
+}
+
+.flexlayout__tab_button_textbox::selection {
+  background-color: #1677ff;
+  color: #ffffff;
+}
+
+.ant-table-wrapper .ant-table-container {
+  border-radius: 0 !important;
+}
+
+.ant-table-wrapper .ant-table-footer {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  border-bottom: none !important;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 4px 8px !important;
+}
+
+.ant-table-thead > tr > th {
+  padding: 8px 8px !important;
+  font-weight: 600 !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.connection-toolbar-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #2f6fed, #1f57c5);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.dark-mode { background: #000; color: #fff; }
+
+body.dark-mode .flexlayout__layout {
+  --color-tabset-background: #141414 !important;
+  --color-tabset-header-background: #000 !important;
+  --color-border-divider-line: #303030 !important;
+  --color-tabset-divider-line: #303030 !important;
+  --color-background: #000 !important;
+  --color-1: #1f1f1f !important;
+  --color-2: #2a2a2a !important;
+  --color-3: #141414 !important;
+  --color-drag-rect: rgba(255, 255, 255, 0.4) !important;
+  --color-text: #fff !important;
+  --color-tab-selected-background: #141414 !important;
+  --color-tab-selected-text: #1677ff !important;
+  --color-tab-unselected-background: transparent !important;
+  --color-tab-unselected-text: #ccc !important;
+}
+
+body.dark-mode .flexlayout__layout {
+  --color-tab-unselected-hover-background: #2a2a2a !important;
+  --color-tab-unselected-hover-text: #fff !important;
+}
