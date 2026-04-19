@@ -1,6 +1,6 @@
 {
   "name": "dbi.commtest",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": false,
   "main": "app-shell/dist/main.js",
   "repository": {
@@ -39,7 +39,8 @@
       "output": "release"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "app-shell/assets/icon.png"
     },
     "nsis": {
       "oneClick": false,
