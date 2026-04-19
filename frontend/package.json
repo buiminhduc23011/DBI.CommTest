@@ -12,7 +12,6 @@
   "dependencies": {
     "antd": "^5.27.6",
     "flexlayout-react": "^0.8.19",
-    "plc-test-studio": "file:..",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.2",
@@ -21,6 +20,7 @@
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@types/node": "^24.6.2",
+    "plc-test-studio": "file:..",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",

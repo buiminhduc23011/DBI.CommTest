@@ -11,9 +11,8 @@
   "devDependencies": {
     "@types/node": "^24.6.2",
     "electron": "^37.4.0",
+    "plc-test-studio": "file:..",
     "typescript": "~5.9.3"
   },
-  "dependencies": {
-    "plc-test-studio": "file:.."
   }
 }
