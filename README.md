@@ -66,7 +66,7 @@ Giao diện desktop chuyên nghiệp với thiết kế high-density, hỗ trợ
 
 | Hãng PLC | Giao thức | Driver | Trạng thái |
 |:---------|:----------|:-------|:----------:|
-| **Generic** | Modbus TCP/RTU | FluentModbus | ✅ Sẵn sàng |
+| **Generic** | Modbus TCP/RTU | DBI.Drivers.Modbus | ✅ Sẵn sàng |
 | **Siemens** | S7-1200 / S7-1500 | Sharp7 | ✅ Sẵn sàng |
 | **Mitsubishi** | FX3U / FX5U (MC Protocol) | McpX | ✅ Sẵn sàng |
 | **Delta** | AS Series / DVP Series | DBI.Drivers.Delta.PLC | ✅ Sẵn sàng |
@@ -122,7 +122,7 @@ DBI CommTest sử dụng kiến trúc **3 lớp** hiện đại:
 | **Frontend** | React 19 · TypeScript · Vite 7 · Ant Design 5 · FlexLayout |
 | **Backend** | .NET 8 · Minimal API · SQLite |
 | **Shell** | Electron 37 · Context Isolation · Sandbox |
-| **Drivers** | FluentModbus · Sharp7 · McpX · DBI.Drivers.Delta.PLC |
+| **Drivers** | DBI.Drivers.Modbus · Sharp7 · McpX · DBI.Drivers.Delta.PLC |
 
 ---
 
