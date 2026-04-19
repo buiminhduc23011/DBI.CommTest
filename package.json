@@ -20,6 +20,10 @@
   "build": {
     "appId": "com.dbivn.commtest",
     "productName": "DBI.CommTest",
+    "files": [
+      "package.json",
+      "app-shell/dist/**/*"
+    ],
     "directories": {
       "output": "release"
     },
