@@ -60,8 +60,5 @@
     "electron": "^37.10.3",
     "electron-builder": "^26.8.1",
     "wait-on": "^8.0.5"
-  },
-  "dependencies": {
-    "plc-test-studio": "file:"
   }
 }
