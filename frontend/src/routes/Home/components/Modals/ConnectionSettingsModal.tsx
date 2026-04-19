@@ -20,7 +20,7 @@ export function ConnectionSettingsModal() {
       okText="Save"
     >
       <Form<ProfileFormValue> form={profileForm} layout="vertical">
-        <Form.Item name="name" label="Profile Name" rules={[{ required: true, message: 'Nhập tên profile' }]}>
+        <Form.Item name="name" label="Profile Name" rules={[{ required: true, message: 'Profile name is required' }]}>
           <Input />
         </Form.Item>
 
@@ -38,10 +38,10 @@ export function ConnectionSettingsModal() {
               name="host"
               label="IP"
               rules={[
-                { required: true, message: 'Nhập IP' },
+                { required: true, message: 'IP address is required' },
                 {
                   pattern: /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-                  message: 'Sai định dạng IPv4',
+                  message: 'Invalid IPv4 format',
                 },
               ]}
             >
@@ -49,7 +49,7 @@ export function ConnectionSettingsModal() {
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item name="port" label="Port" rules={[{ required: true, message: 'Nhập port' }]}>
+            <Form.Item name="port" label="Port" rules={[{ required: true, message: 'Port is required' }]}>
               <InputNumber min={1} max={65535} style={{ width: '100%' }} />
             </Form.Item>
           </Col>

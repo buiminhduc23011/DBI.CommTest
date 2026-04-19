@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="docs/hero_banner.png" alt="DBI CommTest Banner" width="100%"/>
-</p>
-
 <h1 align="center">DBI CommTest</h1>
 
 <p align="center">
@@ -19,12 +15,12 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.3.0-blue?style=flat-square"/>
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue?style=flat-square"/>
   <img alt="License" src="https://img.shields.io/badge/license-MIT-green?style=flat-square"/>
   <img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-purple?style=flat-square&logo=dotnet"/>
   <img alt="React" src="https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react"/>
   <img alt="Electron" src="https://img.shields.io/badge/Electron-37-9feaf9?style=flat-square&logo=electron"/>
-  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=flat-square"/>
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows-lightgrey?style=flat-square"/>
 </p>
 
 ---
@@ -62,7 +58,7 @@ Lưu trữ cấu hình kết nối thành **profile** để tái sử dụng. M�
 Giao diện desktop chuyên nghiệp với thiết kế high-density, hỗ trợ **Dark Mode** hoàn chỉnh — từ thanh tiêu đề, tab, bảng dữ liệu đến status bar.
 
 ### Ứng dụng Desktop native
-Đóng gói bằng Electron, chạy như ứng dụng desktop thực thụ trên **Windows, macOS và Linux** — không cần trình duyệt, không cần internet.
+Đóng gói bằng Electron, chạy như ứng dụng desktop thực thụ trên **Windows** — không cần trình duyệt, không cần internet.
 
 ---
 

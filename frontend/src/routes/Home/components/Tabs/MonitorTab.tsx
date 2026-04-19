@@ -123,7 +123,7 @@ export function MonitorTab() {
   if (!model) return null;
 
   return (
-    <div style={{ height: 'calc(100vh - 120px)', width: '100%', position: 'relative' }}>
+    <div style={{ height: '100%', width: '100%', position: 'relative' }}>
       <style>
         {`
           .flexlayout__layout .flexlayout__tab_button_textbox {

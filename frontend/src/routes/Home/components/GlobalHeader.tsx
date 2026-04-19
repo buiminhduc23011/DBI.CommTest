@@ -4,7 +4,7 @@ import {
   FolderOpenOutlined,
   PlayCircleOutlined,
   SaveOutlined,
-  StopOutlined,
+  PauseOutlined,
   PlusOutlined,
   BulbOutlined,
 } from '@ant-design/icons';
@@ -21,9 +21,18 @@ export function GlobalHeader() {
     activeProfile,
     setProfileManagerOpen,
     saveCurrentSnapshotAsProfile,
+    isDirty,
   } = useHomeContext();
 
   const { mode, toggleTheme } = useAppTheme();
+
+  const isDark = mode === 'dark';
+  const isPolling = connection?.status === 'polling';
+  const isConnecting = connection?.status === 'connecting';
+
+  const bg = isDark ? '#161616' : '#ffffff';
+  const border = isDark ? '#2a2a2a' : '#e4e7ec';
+  const textMuted = isDark ? '#555' : '#b0b8c4';
 
   return (
     <Layout.Header
@@ -31,101 +40,158 @@ export function GlobalHeader() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 16px',
-        background: mode === 'light' ? '#fff' : '#141414',
-        borderBottom: `1px solid ${mode === 'light' ? '#dbe2ea' : '#303030'}`,
-        height: 56,
-        lineHeight: '56px',
+        padding: '0 14px',
+        background: bg,
+        borderBottom: `1px solid ${border}`,
+        height: 48,
+        lineHeight: '48px',
         flexShrink: 0,
         overflow: 'hidden',
       }}
     >
-      <Flex align="center" gap={16}>
+      {/* LEFT */}
+      <Flex align="center" gap={10}>
+        {/* App name */}
+        <Typography.Text
+          strong
+          style={{
+            fontSize: 13,
+            color: isDark ? '#c9d1d9' : '#1a2332',
+            userSelect: 'none',
+            marginRight: 4,
+          }}
+        >
+          DBI.CommTest
+        </Typography.Text>
 
+        <Divider type="vertical" style={{ height: 20, margin: '0 2px', borderColor: border }} />
 
-        <Flex align="center" gap={8}>
-          {connection?.status === 'polling' ? (
-            <Tooltip title="Stop Connection" placement="bottom">
-              <Button
-                type="primary"
-                danger
-                icon={<StopOutlined />}
-                onClick={() => void disconnectCurrent()}
-              >
-                Stop
-              </Button>
-            </Tooltip>
-          ) : (
-            <Tooltip title="Start Connection" placement="bottom">
-              <Button
-                type="primary"
-                icon={<PlayCircleOutlined />}
-                onClick={() => void connectCurrent()}
-                loading={connection?.status === 'connecting'}
-                disabled={!activeProfile}
-              >
-                Start
-              </Button>
-            </Tooltip>
-          )}
-
-          <Divider type="vertical" style={{ height: 24, margin: '0 4px' }} />
-
-          <Tooltip title="Edit Connection Profile" placement="bottom">
+        {/* Start / Stop */}
+        {isPolling ? (
+          <Tooltip title="Stop polling" placement="bottom">
             <Button
-              icon={<ApiOutlined />}
-              onClick={openEditProfile}
-              disabled={!activeProfile}
-              style={activeProfile ? { color: '#1677ff', borderColor: '#1677ff', background: '#e6f4ff', fontWeight: 500 } : undefined}
+              type="primary"
+              danger
+              icon={<PauseOutlined />}
+              onClick={() => void disconnectCurrent()}
+              size="small"
+              style={{ fontWeight: 500 }}
             >
-              Connect
+              Stop
             </Button>
           </Tooltip>
-        </Flex>
-      </Flex>
-
-      <Flex align="center" gap={8} style={{ flexShrink: 0 }}>
-        {activeProfile && (
-          <div style={{ marginRight: 16, display: 'flex', flexDirection: 'column', lineHeight: '1.2', alignItems: 'flex-end', justifyContent: 'center' }}>
-            <Typography.Text type="secondary" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
-              Active Profile
-            </Typography.Text>
-            <Typography.Text strong style={{ fontSize: 13, color: '#1677ff' }}>
-              {activeProfile.name}
-            </Typography.Text>
-          </div>
+        ) : (
+          <Tooltip title={!activeProfile ? 'Select a profile first' : 'Start polling'} placement="bottom">
+            <Button
+              type="primary"
+              icon={<PlayCircleOutlined />}
+              onClick={() => void connectCurrent()}
+              loading={isConnecting}
+              disabled={!activeProfile}
+              size="small"
+              style={{ fontWeight: 500 }}
+            >
+              Start
+            </Button>
+          </Tooltip>
         )}
 
-        <Tooltip title="Create New Profile" placement="bottomRight">
-          <Button
-            type="dashed"
-            icon={<PlusOutlined style={{ fontSize: 16 }} />}
-            onClick={openCreateProfile}
-          />
-        </Tooltip>
-        <Tooltip title="Load Profile" placement="bottomRight">
-          <Button
-            type="default"
-            icon={<FolderOpenOutlined style={{ fontSize: 16 }} />}
-            onClick={() => setProfileManagerOpen(true)}
-          />
-        </Tooltip>
-        <Tooltip title="Save Current Profile" placement="bottomRight">
-          <Button
-            type="primary"
-            icon={<SaveOutlined style={{ fontSize: 16 }} />}
-            onClick={saveCurrentSnapshotAsProfile}
-            disabled={!activeProfile}
-          />
-        </Tooltip>
-        
-        <Divider type="vertical" style={{ height: 24, margin: '0 4px' }} />
-
-        <Tooltip title={mode === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'} placement="bottomRight">
+        {/* Settings */}
+        <Tooltip title="Edit connection profile" placement="bottom">
           <Button
             type="text"
-            icon={<BulbOutlined style={{ fontSize: 18 }} />}
+            icon={<ApiOutlined />}
+            onClick={openEditProfile}
+            disabled={!activeProfile}
+            size="small"
+            style={{ color: isDark ? '#8b949e' : '#57606a' }}
+          >
+            Settings
+          </Button>
+        </Tooltip>
+      </Flex>
+
+      {/* CENTER — Profile name */}
+      <Flex align="center" gap={6} style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+        {activeProfile ? (
+          <>
+            <span
+              style={{
+                display: 'inline-block',
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                background: isPolling ? '#3fb950' : (isDark ? '#30363d' : '#d0d7de'),
+                flexShrink: 0,
+                transition: 'background 0.3s',
+                boxShadow: isPolling ? '0 0 0 3px rgba(63,185,80,0.2)' : 'none',
+              }}
+            />
+            <Typography.Text
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: isDark ? '#c9d1d9' : '#1a2332',
+                maxWidth: 260,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {activeProfile.name}
+            </Typography.Text>
+          </>
+        ) : (
+          <Typography.Text style={{ fontSize: 12, color: textMuted }}>
+            No profile
+          </Typography.Text>
+        )}
+      </Flex>
+
+      {/* RIGHT — Actions + theme */}
+      <Flex align="center" gap={2}>
+        <Tooltip title="New profile" placement="bottomRight">
+          <Button
+            type="text"
+            size="small"
+            icon={<PlusOutlined />}
+            onClick={openCreateProfile}
+            style={{ color: isDark ? '#8b949e' : '#57606a' }}
+          />
+        </Tooltip>
+        <Tooltip title="Load profile" placement="bottomRight">
+          <Button
+            type="text"
+            size="small"
+            icon={<FolderOpenOutlined />}
+            onClick={() => setProfileManagerOpen(true)}
+            style={{ color: isDark ? '#8b949e' : '#57606a' }}
+          />
+        </Tooltip>
+        <Tooltip title={isDirty ? "Save profile (Unsaved changes)" : "Save profile"} placement="bottomRight">
+          <Button
+            type={isDirty ? 'primary' : 'text'}
+            size="small"
+            icon={<SaveOutlined />}
+            onClick={saveCurrentSnapshotAsProfile}
+            disabled={!activeProfile}
+            style={{ 
+              color: isDirty ? '#fff' : (isDark ? '#8b949e' : '#57606a'),
+              background: isDirty ? '#1677ff' : undefined,
+              borderColor: isDirty ? '#1677ff' : 'transparent',
+            }}
+          />
+        </Tooltip>
+
+        <Divider type="vertical" style={{ height: 16, margin: '0 6px', borderColor: border }} />
+
+        <Tooltip title={isDark ? 'Light mode' : 'Dark mode'} placement="bottomRight">
+          <Button
+            type="text"
+            size="small"
+            icon={<BulbOutlined style={{ fontSize: 15 }} />}
             onClick={toggleTheme}
+            style={{ color: isDark ? '#8b949e' : '#57606a' }}
           />
         </Tooltip>
       </Flex>

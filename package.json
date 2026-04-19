@@ -1,19 +1,60 @@
 {
-  "name": "plc-test-studio",
-  "version": "0.1.0",
-  "private": true,
+  "name": "dbi.commtest",
+  "version": "1.0.0",
+  "private": false,
+  "main": "app-shell/dist/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buiminhduc23011/DBI.CommTest"
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "npm run build:frontend && npm run build:backend && npm run build:shell",
     "build:frontend": "npm run build --prefix frontend",
-    "build:backend": "dotnet publish backend/backend.csproj -c Release -o backend/publish",
+    "build:backend": "dotnet publish backend/backend.csproj -p:PublishSingleFile=true -r win-x64 -c Release --self-contained true -o backend/publish",
     "build:shell": "npm run build --prefix app-shell",
     "lint": "npm run lint --prefix frontend && dotnet build backend/backend.csproj -nologo",
-    "smoke-run": "node scripts/smoke-run.mjs"
+    "smoke-run": "node scripts/smoke-run.mjs",
+    "pack:win": "electron-builder --win --x64 --publish always"
+  },
+  "build": {
+    "appId": "com.dbivn.commtest",
+    "productName": "DBI.CommTest",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "runAfterFinish": true
+    },
+    "extraFiles": [
+      {
+        "from": "backend/publish",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "frontend/dist",
+        "to": "frontend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
+    "electron": "^37.10.3",
+    "electron-builder": "^26.8.1",
     "wait-on": "^8.0.5"
   },
   "dependencies": {

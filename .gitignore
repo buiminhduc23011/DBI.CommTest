@@ -14,3 +14,10 @@ backend-run.pid
 session_log.txt
 session.json
 CHANGELOG.md
+backend/publish/
+release/
+dist/
+build/
+*.exe
+*.dll
+*.pdb

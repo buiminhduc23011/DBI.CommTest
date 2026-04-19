@@ -77,6 +77,25 @@ export function StatusBar() {
         {connection?.lastError && (
           <span style={{ fontSize: 12, color: '#cf1322' }}>Error: {connection.lastError}</span>
         )}
+        <a 
+          href="https://dbivn.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ 
+            fontSize: 12, 
+            color: '#888', 
+            borderLeft: mode === 'light' ? '1px solid #ccc' : '1px solid #444', 
+            paddingLeft: 12, 
+            fontWeight: 500,
+            transition: 'color 0.2s',
+            textDecoration: 'none'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = '#1677ff'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#888'}
+          title="Visit our website"
+        >
+          Design by DBI | version 1.0.0
+        </a>
       </Space>
     </Layout.Footer>
   );

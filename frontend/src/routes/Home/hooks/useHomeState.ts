@@ -77,7 +77,12 @@ export function useHomeState() {
     const initial = profiles.length > 0 ? structuredClone(profiles[0].watchTables) : [{ id: id(), name: 'Watch Table 1', registers: [] }];
     return initial.length > 0 ? initial : [{ id: id(), name: 'Watch Table 1', registers: [] }];
   });
-  const [selectedRegisterId, setSelectedRegisterId] = useState<string | undefined>();
+  const [selectedRegisterId, _setSelectedRegisterId] = useState<string | undefined>();
+  const selectedRegisterIdRef = useRef<string | undefined>(undefined);
+  const setSelectedRegisterId = useCallback((id: string | undefined) => {
+    selectedRegisterIdRef.current = id;
+    _setSelectedRegisterId(id);
+  }, []);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileManagerOpen, setProfileManagerOpen] = useState(false);
   const [connection, setConnection] = useState<RuntimeConnectionState | null>(null);
@@ -87,6 +92,28 @@ export function useHomeState() {
     [profiles, activeProfileId]
   );
   const pollIntervalMs = activeProfile?.pollIntervalMs ?? 1000;
+
+  const isDirty = useMemo(() => {
+    if (!activeProfile) return false;
+    // Compare basic stringified arrays to detect unsaved changes
+    const currentJson = JSON.stringify(watchTables);
+    const savedJson = JSON.stringify(activeProfile.watchTables);
+    return currentJson !== savedJson;
+  }, [activeProfile, watchTables]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = ''; // Triggers Electron's native will-prevent-unload
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isDirty]);
 
   useEffect(() => {
     connectionRef.current = connection;
@@ -98,6 +125,13 @@ export function useHomeState() {
       pollTimeoutRef.current = null;
     }
   }, []);
+  const setAllWatchTablesQualityBad = useCallback(() => {
+    setWatchTables((prev) => prev.map((table) => ({
+      ...table,
+      registers: table.registers.map(r => ({ ...r, quality: 'Bad' }))
+    })));
+  }, []);
+
 
   const addTrace = useCallback((level: TraceLog['level'], msg: string) => {
     setLogs((prev) => {
@@ -191,7 +225,7 @@ export function useHomeState() {
             tagId: register.id,
             address: register.address,
             dataType: register.dataType,
-            rwMode: register.rwMode,
+            rwMode: 'R',
           }],
         }),
       });
@@ -226,7 +260,7 @@ export function useHomeState() {
     }
 
     const currentConnection = connectionRef.current;
-    updateRegisterFields(tableId, registerId, { quality: currentConnection?.status === 'polling' ? register.quality : 'Good' });
+    updateRegisterFields(tableId, registerId, { quality: currentConnection?.status === 'polling' ? register.quality : 'Bad' });
 
     if (currentConnection?.status === 'polling') {
       await applyRegisterRuntime(registerId, true);
@@ -280,7 +314,7 @@ export function useHomeState() {
 
     const allRegisters = watchTables.flatMap((table) => table.registers);
     const readTargets = allRegisters
-      .filter((r) => r.rwMode === 'R')
+      .filter((r) => r.address && r.address.trim() !== '')
       .map((register) => ({ register, validation: validateRegister(register) }));
 
     const validReads = readTargets.filter((item) => item.validation.valid).map((item) => item.register);
@@ -322,7 +356,7 @@ export function useHomeState() {
             tagId: register.id,
             address: register.address,
             dataType: register.dataType,
-            rwMode: register.rwMode,
+            rwMode: 'R',
           })),
         }),
       });
@@ -336,11 +370,13 @@ export function useHomeState() {
             const item = itemMap.get(register.id);
             if (!item) return register;
             return {
-              ...register,
-              value: item.value === null || item.value === undefined ? register.value : String(item.value),
-              quality: item.quality === 'Timeout' ? 'Timeout' : item.quality === 'Bad' ? 'Bad' : 'Good',
-              lastUpdate: now,
-            };
+                ...register,
+                value: (register.id === selectedRegisterIdRef.current) 
+                        ? register.value 
+                        : (item.value === null || item.value === undefined ? register.value : String(item.value)),
+                quality: item.quality === 'Timeout' ? 'Timeout' : item.quality === 'Bad' ? 'Bad' : 'Good',
+                lastUpdate: now,
+              };
           }),
         }))
       );
@@ -372,6 +408,7 @@ export function useHomeState() {
             }
           : prev
       );
+        setAllWatchTablesQualityBad();
       addTrace('error', `Sync error: ${errorMessage}`);
     } finally {
       pollInFlightRef.current = false;
@@ -455,6 +492,7 @@ export function useHomeState() {
 
       connectionRef.current = errorState;
       setConnection(errorState);
+      setAllWatchTablesQualityBad();
       addTrace('error', `Connection failed: ${errorMessage}`);
       messageApi.error('Connection failed');
     }
@@ -479,6 +517,7 @@ export function useHomeState() {
 
     connectionRef.current = null;
     setConnection(null);
+      setAllWatchTablesQualityBad();
     addTrace('warn', 'Disconnected');
   }, [addTrace, clearScheduledPoll]);
 
@@ -550,7 +589,7 @@ export function useHomeState() {
   const deleteProfileData = useCallback((profile: DeviceProfile) => {
     Modal.confirm({
       title: 'Delete Profile',
-      content: `B?n mu?n x�a profile ${profile.name}?`,
+      content: `B?n mu?n xa profile ${profile.name}?`,
       okText: 'Delete',
       okType: 'danger',
       onOk: () => {
@@ -569,13 +608,57 @@ export function useHomeState() {
   }, [profiles, persistProfiles, activeProfileId, applyProfileData]);
 
   const writeRegisterValue = useCallback(async (registerId: string, value: string) => {
+    const register = getRegisterById(registerId);
+    if (!register) return;
+
     updateRegisterFields(findTableId(registerId), registerId, { value });
-    await applyRegisterRuntime(registerId, false);
-  }, [applyRegisterRuntime, updateRegisterFields, findTableId]);
+    
+    const currentConnection = connectionRef.current;
+    if (!currentConnection?.runtimeId || currentConnection.status !== 'polling') return;
+
+    const tableId = findTableId(registerId);
+    try {
+      await runtimeFetch(`/api/runtime/connections/${currentConnection.runtimeId}/write`, {
+        method: 'POST',
+        body: JSON.stringify({
+          address: register.address,
+          dataType: register.dataType,
+          values: [value],
+        }),
+      });
+      // Ghi xong -> Read liá»n
+      const response = await runtimeFetch<RuntimeReadResponse>(`/api/runtime/connections/${currentConnection.runtimeId}/read`, {
+        method: 'POST',
+        body: JSON.stringify({
+          items: [{
+            tagId: register.id,
+            address: register.address,
+            dataType: register.dataType,
+            rwMode: 'R',
+          }],
+        }),
+      });
+      const item = response.items[0];
+      if (item) {
+        updateRegisterFields(tableId, registerId, { 
+          quality: item.quality === 'Timeout' ? 'Timeout' : item.quality === 'Bad' ? 'Bad' : 'Good',
+          lastUpdate: getCurrentTime(),
+          value: item.value === null || item.value === undefined ? value : String(item.value)
+        });
+        addTrace('info', `Applied write and read back for ${register.address} = ${item.value}`);
+      }
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error, 'Write failed');
+      updateRegisterFields(tableId, registerId, { quality: 'Bad' });
+      messageApi.error(`Write failed: ${errorMessage}`);
+      addTrace('error', `Write error: ${errorMessage}`);
+    }
+  }, [getRegisterById, findTableId, updateRegisterFields, messageApi, addTrace]);
 
   const addRegister = useCallback((tableId: string) => {
     setWatchTables((prev) => prev.map((table) => {
       if (table.id !== tableId) return table;
+      const index = table.registers.length + 1;
       const defaultAddress = activeProfile?.protocol === 'Modbus TCP'
         ? `${40001 + table.registers.length}`
         : activeProfile?.protocol?.startsWith('Siemens')
@@ -584,7 +667,7 @@ export function useHomeState() {
 
       const newRegister: RegisterRow = {
         id: id(),
-        tagName: `Tag_${Math.floor(Math.random() * 1000)}`,
+        tagName: `Tag_${index}`,
         address: defaultAddress,
         value: '0',
         dataType: 'Int16',
@@ -597,11 +680,50 @@ export function useHomeState() {
     }));
   }, [activeProfile, addTrace]);
 
+  const addBulkRegisters = useCallback((tableId: string, startAddress: string, count: number, dataType: string) => {
+    setWatchTables((prev) => prev.map((table) => {
+      if (table.id !== tableId) return table;
+
+      const baseIndex = table.registers.length;
+      const newRegisters: RegisterRow[] = [];
+
+      // Parse the start address to increment numerically
+      const addrMatch = startAddress.match(/^([A-Za-z.]*)(\d+)(.*)$/);
+
+      for (let i = 0; i < count; i++) {
+        let address: string;
+        if (addrMatch) {
+          const prefix = addrMatch[1];
+          const num = parseInt(addrMatch[2], 10) + i;
+          const suffix = addrMatch[3];
+          address = `${prefix}${num}${suffix}`;
+        } else {
+          address = i === 0 ? startAddress : `${startAddress}_${i}`;
+        }
+
+        newRegisters.push({
+          id: id(),
+          tagName: `Tag_${baseIndex + i + 1}`,
+          address: address.toUpperCase(),
+          value: '0',
+          dataType: dataType as RegisterRow['dataType'],
+          rwMode: 'R',
+          quality: 'Bad',
+          lastUpdate: '-',
+        });
+      }
+
+      addTrace('info', `Added ${count} registers starting at ${startAddress} to ${table.name}`);
+      return { ...table, registers: [...table.registers, ...newRegisters] };
+    }));
+  }, [addTrace]);
+
   const removeRegister = useCallback((tableId: string, regId: string) => {
-    setWatchTables((prev) => prev.map((table) => table.id !== tableId ? table : { ...table, registers: table.registers.filter((r) => r.id !== regId) }));
-    if (selectedRegisterId === regId) setSelectedRegisterId(undefined);
-    addTrace('warn', 'Removed one register from UI');
-  }, [selectedRegisterId, addTrace]);
+    setWatchTables((prev) => prev.map((table) => {
+      if (table.id !== tableId) return table;
+      return { ...table, registers: table.registers.filter((r) => r.id !== regId) };
+    }));
+  }, []);
 
   return {
     contextHolder,
@@ -634,7 +756,9 @@ export function useHomeState() {
     deleteProfileData,
     writeRegisterValue,
     addRegister,
+    addBulkRegisters,
     removeRegister,
+    isDirty,
   };
 }
 

@@ -141,51 +141,51 @@ export function validateRegisterAddress(protocol: Protocol, address: string, dat
     if (/^\d{5,6}$/.test(text)) {
       const numeric = Number(text);
       if (numeric >= 1 && numeric <= 9999) {
-        return dataType === 'Bool' ? { valid: true } : { valid: false, message: 'Coil 0xxxx ch? dùng Bool.' };
+        return dataType === 'Bool' ? { valid: true } : { valid: false, message: 'Coil 0xxxx supports only Bool.' };
       }
       if (numeric >= 10001 && numeric <= 19999) {
-        return dataType === 'Bool' ? { valid: true } : { valid: false, message: 'Discrete Input 1xxxx ch? dùng Bool.' };
+        return dataType === 'Bool' ? { valid: true } : { valid: false, message: 'Discrete Input 1xxxx supports only Bool.' };
       }
       if (numeric >= 30001 && numeric <= 39999) {
-        return dataType !== 'Bool' ? { valid: true } : { valid: false, message: 'Input Register 3xxxx không dùng Bool.' };
+        return dataType !== 'Bool' ? { valid: true } : { valid: false, message: 'Input Register 3xxxx does not support Bool.' };
       }
       if (numeric >= 40001 && numeric <= 49999) {
-        return dataType !== 'Bool' ? { valid: true } : { valid: false, message: 'Holding Register 4xxxx không dùng Bool.' };
+        return dataType !== 'Bool' ? { valid: true } : { valid: false, message: 'Holding Register 4xxxx does not support Bool.' };
       }
-      return { valid: false, message: 'Modbus ph?i thu?c vùng 00001/10001/30001/40001.' };
+      return { valid: false, message: 'Modbus address must be in range 00001/10001/30001/40001.' };
     }
 
     if (/^(C|DI)\d+$/.test(text)) {
-      return dataType === 'Bool' ? { valid: true } : { valid: false, message: `${text.replace(/\d+/g, '')} ch? dùng Bool.` };
+      return dataType === 'Bool' ? { valid: true } : { valid: false, message: `${text.replace(/\d+/g, '')} supports only Bool.` };
     }
     if (/^(IR|HR)\d+$/.test(text)) {
-      return dataType !== 'Bool' ? { valid: true } : { valid: false, message: `${text.replace(/\d+/g, '')} không dùng Bool.` };
+      return dataType !== 'Bool' ? { valid: true } : { valid: false, message: `${text.replace(/\d+/g, '')} does not support Bool.` };
     }
 
-    return { valid: false, message: 'Modbus address không h?p l?.' };
+    return { valid: false, message: 'Invalid Modbus address.' };
   }
 
   if (protocol.startsWith('Siemens')) {
     if (/^DB\d+\.DBX\d+\.[0-7]$/.test(text) || /^(I|Q|M)\d+\.[0-7]$/.test(text)) {
-      return dataType === 'Bool' ? { valid: true } : { valid: false, message: 'Ð?a ch? bit Siemens ch? dùng Bool.' };
+      return dataType === 'Bool' ? { valid: true } : { valid: false, message: 'Siemens bit address supports only Bool.' };
     }
     if (/^DB\d+\.DB(B|W|D)\d+$/.test(text) || /^(I|Q|M)(B|W|D)\d+$/.test(text)) {
-      return dataType !== 'Bool' ? { valid: true } : { valid: false, message: 'Ð?a ch? byte/word/dword Siemens không dùng Bool.' };
+      return dataType !== 'Bool' ? { valid: true } : { valid: false, message: 'Siemens byte/word/dword address does not support Bool.' };
     }
-    return { valid: false, message: 'Siemens address không h?p l?.' };
+    return { valid: false, message: 'Invalid Siemens address.' };
   }
 
   const match = /^(TN|CN|TC|CC|TS|CS|SN|SC|SS|ZR|SM|SD|DX|DY|D|M|X|Y|R|S|T|C|L|F|V|B|W|Z)([0-9A-F]+)$/.exec(text);
   if (!match) {
-    return { valid: false, message: `${protocol} address không h?p l?.` };
+    return { valid: false, message: `Invalid ${protocol} address.` };
   }
 
   const prefix = match[1];
   if (isBoolOnlyPrefix(prefix)) {
-    return dataType === 'Bool' ? { valid: true } : { valid: false, message: `${prefix} ch? dùng Bool.` };
+    return dataType === 'Bool' ? { valid: true } : { valid: false, message: `${prefix} supports only Bool.` };
   }
   if (isWordOnlyPrefix(prefix)) {
-    return dataType !== 'Bool' ? { valid: true } : { valid: false, message: `${prefix} không dùng Bool.` };
+    return dataType !== 'Bool' ? { valid: true } : { valid: false, message: `${prefix} does not support Bool.` };
   }
 
   return { valid: true };
@@ -204,7 +204,7 @@ export function normalizeStoredRegister(value: unknown, protocol: Protocol): Reg
     value: toText(value.value),
     dataType: asDataType(toText(value.dataType) || 'Int16'),
     rwMode: asRw(toText(value.rwMode) || 'R'),
-    quality: toQuality(value.quality),
+    quality: 'Bad',
     lastUpdate: toText(value.lastUpdate) || '-',
   };
 }
@@ -267,4 +267,48 @@ export function normalizeStoredProfiles(value: unknown): DeviceProfile[] {
   return value
     .map((item) => normalizeStoredProfile(item))
     .filter((item): item is DeviceProfile => item !== null);
+}
+
+export function getAddressPlaceholder(protocol: string | undefined, dataType: string): string {
+  if (!protocol) return 'Address...';
+  const isBool = dataType === 'Bool';
+  if (protocol === 'Modbus TCP') return isBool ? 'e.g. 00001, 10001' : 'e.g. 40001, 30001';
+  if (protocol.startsWith('Siemens')) return isBool ? 'e.g. DB1.DBX0.0, M0.0' : 'e.g. DB1.DBW0, MW0';
+  if (protocol.startsWith('Mitsubishi')) return isBool ? 'e.g. Y0, X0, M0' : 'e.g. D0, R0';
+  if (protocol.startsWith('Delta')) return isBool ? 'e.g. Y0, X0, M0' : 'e.g. D0';
+  return 'Address...';
+}
+
+export function isReadOnlyAddress(protocol: string | undefined, address: string): boolean {
+  if (!protocol || !address) return false;
+  const text = address.toUpperCase();
+
+  if (protocol === 'Modbus TCP') {
+    if (/^\d{5,6}$/.test(text)) {
+      const numeric = Number(text);
+      if ((numeric >= 10001 && numeric <= 19999) || (numeric >= 30001 && numeric <= 39999)) {
+        return true;
+      }
+    }
+    if (/^DI\d+$/.test(text) || /^IR\d+$/.test(text)) {
+      return true;
+    }
+    return false;
+  }
+
+  if (protocol.startsWith('Siemens')) {
+    if (/^I\d+\.[0-7]$/.test(text) || /^I(B|W|D)\d+$/.test(text)) {
+      return true;
+    }
+    return false;
+  }
+
+  if (protocol.startsWith('Mitsubishi') || protocol.startsWith('Delta')) {
+    if (/^(X|Y)[0-9A-F]+$/.test(text)) {
+      return true;
+    }
+    return false;
+  }
+
+  return false;
 }
