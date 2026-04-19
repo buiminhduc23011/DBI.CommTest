@@ -1,6 +1,6 @@
 {
   "name": "dbi.commtest",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": false,
   "main": "app-shell/dist/main.js",
   "repository": {
@@ -20,6 +20,16 @@
   "build": {
     "appId": "com.dbivn.commtest",
     "productName": "DBI.CommTest",
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "release"
+      }
+    ],
+    "releaseInfo": {
+      "releaseName": "DBI.CommTest v${version}",
+      "releaseNotes": "###  What is DBI.CommTest?\nDBI.CommTest is a free, modern, and lightweight multi-protocol PLC communication testing utility designed for automation engineers. It provides a real-time monitoring interface to seamlessly diagnose and verify PLC connectivity without requiring manufacturer IDEs (like TIA Portal or GX Works).\n\n### 📦 Release Notes:\n- Auto-packaged as a Standalone Windows Installer (`.exe`).\n- No external dependencies required (Node.js or .NET are bundled inside).\n- Fully integrated Frontend, Backend API, and Multi-protocol Drivers.\n\n### ⚡ Installation:\nDownload the **DBI.CommTest-Setup-${version}.exe** file from the Assets section below to install and use it instantly."
+    },
     "files": [
       "package.json",
       "app-shell/dist/**/*"
