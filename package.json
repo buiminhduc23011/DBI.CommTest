@@ -1,6 +1,6 @@
 {
   "name": "dbi.commtest",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "private": false,
   "main": "app-shell/dist/main.js",
   "repository": {
@@ -32,14 +32,15 @@
     },
     "files": [
       "package.json",
-      "app-shell/dist/**/*"
+      "app-shell/dist/**/*",
+      "app-shell/assets/**/*"
     ],
     "directories": {
       "output": "release"
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon": "app-shell/assets/icon.ico"
     },
     "nsis": {
       "oneClick": false,

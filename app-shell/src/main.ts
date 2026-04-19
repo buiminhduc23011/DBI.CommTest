@@ -51,6 +51,7 @@ async function createWindow() {
   }
 
   const win = new BrowserWindow({
+    title: 'DBI Platform',
     width: 1280,
     height: 800,
     minWidth: 1024,
