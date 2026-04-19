@@ -13,26 +13,34 @@ jobs:
       contents: write # Important: Allow GitHub Action to upload and edit Releases
       
     steps:
-      - name: 📥 Check out Git repository
+      - name: Check out Git repository
         uses: actions/checkout@v4
 
-      - name: 🟩 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: 🟦 Setup .NET Core
+      - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: 📦 Install Root Dependencies
+      - name: Install Root Dependencies
         run: npm ci || npm install
 
-      - name: 🛠️ Build Application (Frontend, Backend, Shell)
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci || npm install
+
+      - name: Install App-Shell Dependencies
+        working-directory: ./app-shell
+        run: npm ci || npm install
+
+      - name: Build Application (Frontend, Backend, Shell)
         run: npm run build
 
-      - name: 🚀 Package & Publish Release (.exe)
+      - name: Package & Publish Release (.exe)
         run: npm run pack:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
