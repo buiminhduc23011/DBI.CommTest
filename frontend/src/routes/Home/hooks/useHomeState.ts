@@ -78,7 +78,7 @@ export function useHomeState() {
     const tables = initial.length > 0 ? initial : [{ id: id(), name: 'Watch Table 1', registers: [] }];
     return tables.map(t => ({
       ...t,
-      registers: t.registers.map(r => ({ ...r, quality: 'N/A' as const, value: 'N/A' }))
+      registers: t.registers.map(r => ({ ...r, quality: 'N/A' as const }))
     }));
   });
   const [selectedRegisterId, _setSelectedRegisterId] = useState<string | undefined>();
@@ -148,7 +148,7 @@ export function useHomeState() {
   const setAllWatchTablesDisconnected = useCallback(() => {
     setWatchTables((prev) => prev.map((table) => ({
       ...table,
-      registers: table.registers.map(r => ({ ...r, quality: 'N/A', value: 'N/A' }))
+      registers: table.registers.map(r => ({ ...r, quality: 'N/A' }))
     })));
   }, []);
 
@@ -292,7 +292,7 @@ export function useHomeState() {
     const tables = profile.watchTables.length > 0 ? structuredClone(profile.watchTables) : [{ id: id(), name: 'Watch Table 1', registers: [] }];
     setWatchTables(tables.map(t => ({
       ...t,
-      registers: t.registers.map(r => ({ ...r, quality: 'N/A', value: 'N/A' }))
+      registers: t.registers.map(r => ({ ...r, quality: 'N/A' }))
     })));
     setProfileManagerOpen(false);
     addTrace('info', `Loaded profile [${profile.name}]`);
