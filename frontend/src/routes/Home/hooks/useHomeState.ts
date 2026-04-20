@@ -87,6 +87,15 @@ export function useHomeState() {
   const [profileManagerOpen, setProfileManagerOpen] = useState(false);
   const [connection, setConnection] = useState<RuntimeConnectionState | null>(null);
 
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return localStorage.getItem('dbi_onboarding_completed') !== 'true';
+  });
+
+  const finishOnboarding = useCallback(() => {
+    localStorage.setItem('dbi_onboarding_completed', 'true');
+    setShowOnboarding(false);
+  }, []);
+
   const activeProfile = useMemo(
     () => profiles.find((p) => p.id === activeProfileId),
     [profiles, activeProfileId]
@@ -129,6 +138,13 @@ export function useHomeState() {
     setWatchTables((prev) => prev.map((table) => ({
       ...table,
       registers: table.registers.map(r => ({ ...r, quality: 'Bad' }))
+    })));
+  }, []);
+
+  const setAllWatchTablesDisconnected = useCallback(() => {
+    setWatchTables((prev) => prev.map((table) => ({
+      ...table,
+      registers: table.registers.map(r => ({ ...r, quality: 'N/A' }))
     })));
   }, []);
 
@@ -260,7 +276,7 @@ export function useHomeState() {
     }
 
     const currentConnection = connectionRef.current;
-    updateRegisterFields(tableId, registerId, { quality: currentConnection?.status === 'polling' ? register.quality : 'Bad' });
+    updateRegisterFields(tableId, registerId, { quality: currentConnection?.status === 'polling' ? register.quality : 'N/A' });
 
     if (currentConnection?.status === 'polling') {
       await applyRegisterRuntime(registerId, true);
@@ -517,7 +533,7 @@ export function useHomeState() {
 
     connectionRef.current = null;
     setConnection(null);
-      setAllWatchTablesQualityBad();
+    setAllWatchTablesDisconnected();
     addTrace('warn', 'Disconnected');
   }, [addTrace, clearScheduledPoll]);
 
@@ -669,10 +685,10 @@ export function useHomeState() {
         id: id(),
         tagName: `Tag_${index}`,
         address: defaultAddress,
-        value: '0',
+        value: 'N/A',
         dataType: 'Int16',
         rwMode: 'R',
-        quality: 'Bad',
+        quality: 'N/A',
         lastUpdate: '-',
       };
       addTrace('info', `Added register ${newRegister.tagName} [${newRegister.address}] to ${table.name}`);
@@ -705,10 +721,10 @@ export function useHomeState() {
           id: id(),
           tagName: `Tag_${baseIndex + i + 1}`,
           address: address.toUpperCase(),
-          value: '0',
+          value: 'N/A',
           dataType: dataType as RegisterRow['dataType'],
           rwMode: 'R',
-          quality: 'Bad',
+          quality: 'N/A',
           lastUpdate: '-',
         });
       }
@@ -759,6 +775,8 @@ export function useHomeState() {
     addBulkRegisters,
     removeRegister,
     isDirty,
+    showOnboarding,
+    finishOnboarding,
   };
 }
 

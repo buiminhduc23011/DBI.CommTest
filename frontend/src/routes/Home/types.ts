@@ -1,4 +1,4 @@
-export type Quality = 'Good' | 'Bad' | 'Timeout';
+export type Quality = 'Good' | 'Bad' | 'Timeout' | 'N/A';
 export type Protocol = 'Modbus TCP' | 'Siemens S7-1200' | 'Siemens S7-1500' | 'Mitsubishi FX3U' | 'Mitsubishi FX5U' | 'Delta AS' | 'Delta DVP';
 export type DataType = 'Bool' | 'Int16' | 'UInt16' | 'Int32' | 'Float';
 export type RwMode = 'R' | 'W';

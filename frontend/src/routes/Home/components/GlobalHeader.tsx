@@ -70,6 +70,7 @@ export function GlobalHeader() {
         {isPolling ? (
           <Tooltip title="Stop polling" placement="bottom">
             <Button
+              id="tour-start-engine"
               type="primary"
               danger
               icon={<PauseOutlined />}
@@ -83,6 +84,7 @@ export function GlobalHeader() {
         ) : (
           <Tooltip title={!activeProfile ? 'Select a profile first' : 'Start polling'} placement="bottom">
             <Button
+              id="tour-start-engine"
               type="primary"
               icon={<PlayCircleOutlined />}
               onClick={() => void connectCurrent()}
@@ -99,6 +101,7 @@ export function GlobalHeader() {
         {/* Settings */}
         <Tooltip title="Edit connection profile" placement="bottom">
           <Button
+            id="tour-connection-settings"
             type="text"
             icon={<ApiOutlined />}
             onClick={openEditProfile}
@@ -161,6 +164,7 @@ export function GlobalHeader() {
         </Tooltip>
         <Tooltip title="Load profile" placement="bottomRight">
           <Button
+            id="tour-profile-manager"
             type="text"
             size="small"
             icon={<FolderOpenOutlined />}

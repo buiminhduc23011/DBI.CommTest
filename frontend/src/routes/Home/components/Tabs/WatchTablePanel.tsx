@@ -159,6 +159,7 @@ export function WatchTablePanel({ table }: Props) {
         width: 140,
         render: (value: string, row) => (
           <Input
+            id={row.id === table.registers[0]?.id ? 'tour-write-data' : undefined}
             value={value}
             size="small"
             bordered={false}
@@ -213,6 +214,7 @@ export function WatchTablePanel({ table }: Props) {
         render: (value: Quality) => {
           if (value === 'Good') return <span style={{ color: '#52c41a', fontWeight: 500, paddingLeft: 8 }}>Good</span>;
           if (value === 'Timeout') return <span style={{ color: '#faad14', fontWeight: 500, paddingLeft: 8 }}>Timeout</span>;
+          if (value === 'N/A') return <span style={{ color: '#888', fontWeight: 500, paddingLeft: 8 }}>N/A</span>;
           return <span style={{ color: '#ff4d4f', fontWeight: 500, paddingLeft: 8 }}>Bad</span>;
         },
       },
@@ -283,6 +285,7 @@ export function WatchTablePanel({ table }: Props) {
         title={null}
       >
         <div
+          id="tour-bulk-add"
           role="button"
           style={{
             flexShrink: 0,
