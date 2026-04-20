@@ -1,6 +1,6 @@
 {
   "name": "dbi.commtest",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "private": false,
   "main": "app-shell/dist/main.js",
   "repository": {
